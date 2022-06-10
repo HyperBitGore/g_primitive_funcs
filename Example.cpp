@@ -49,9 +49,9 @@ float randFloat(float min, float max) {
 }
 
 int main(){
-	MuliArray::Array ar1;
+	Gore::MultiVector ar1;
 	srand(time(NULL));
-
+	ar1.reserve(200);
 	TESTTYPE t = { 100, 1000, 0.2f, 100.524 };
 	ar1.push_back((char*)&t, sizeof(TESTTYPE), 0);
 	for (int i = 0; i < 100; i++) {
@@ -73,7 +73,8 @@ int main(){
 	std::vector<EVERTYPE> test2;
 	bool exitf = false;
 	//while (!exitf) {
-
+	ar1.erase(20);
+	ar1.push_back((char*)&t1, sizeof(TESTTYPE), 0);
 		for (size_t i = 0; i < ar1.getSize(); i++) {
 			//deserilize each set of data differently into their corresponding structs
 			switch (ar1[i].type) {
@@ -93,7 +94,7 @@ int main(){
 	test1;
 	test2;
 
-	std::cout << sizeof(MuliArray::Array) << std::endl;
+	std::cout << sizeof(Gore::MultiVector) << std::endl;
 
 	return 0;
 }
