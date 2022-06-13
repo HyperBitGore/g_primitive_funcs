@@ -44,15 +44,62 @@ struct EVERTYPE {
 
 float randFloat(float min, float max) {
 	float out = rand() / static_cast<float>(RAND_MAX / (max - min));
-	std::cout << out << "\n";
 	return out;
 }
 
 int main(){
 	Gore::MultiVector ar1;
+	Gore::Vector<TESTTYPE> vec1;
+	std::vector<TESTTYPE> vec2;
 	srand(time(NULL));
 	ar1.reserve(200);
+	//speed testing my vector against standard library one
 	TESTTYPE t = { 100, 1000, 0.2f, 100.524 };
+	std::chrono::steady_clock::time_point time1 = std::chrono::steady_clock::now();
+	for (int i = 0; i < 1000; i++) {
+		TESTTYPE tep = { 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 };
+		vec1.push_back(tep);
+	}
+	std::chrono::steady_clock::time_point time2 = std::chrono::steady_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1);
+	std::cout << time_span.count() << "\n";
+	time1 = std::chrono::steady_clock::now();
+	for (int i = 0; i < 1000; i++) {
+		TESTTYPE tep = { rand() % 1000, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 };
+		vec2.push_back(tep);
+	}
+	time2 = std::chrono::steady_clock::now();
+	time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1);
+	std::cout << time_span.count() << "\n";
+
+	time1 = std::chrono::steady_clock::now();
+	for (int i = 0; i < 100; i++) {
+		int r = rand() % 10;
+		vec1.erase(r);
+	}
+	time2 = std::chrono::steady_clock::now();
+	time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1);
+	std::cout << time_span.count() << "\n";
+
+	time1 = std::chrono::steady_clock::now();
+	for (int i = 0; i < 100; i++) {
+		int r = rand() % 10;
+		vec2.erase(vec2.begin() + r);
+	}
+	time2 = std::chrono::steady_clock::now();
+	time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1);
+	std::cout << time_span.count() << "\n";
+	//just testing my vector
+	std::cout << vec1[20].x << std::endl;
+	vec1[20].x = 100;
+	std::cout << vec1[20].x << std::endl;
+	vec1[21].x = 205;
+	vec1.erase(20);
+	std::cout << vec1[20].x << std::endl;
+	vec1.push_back(t);
+	for (size_t i = 0; i < vec1.size(); i++) {
+		std::cout << i << " :" << vec1[i].x << " \n";
+	}
 	ar1.push_back((char*)&t, sizeof(TESTTYPE), 0);
 	for (int i = 0; i < 100; i++) {
 		int r = rand() % 100;
@@ -65,28 +112,29 @@ int main(){
 			ar1.push_back((char*)&et, sizeof(EVERTYPE), 1);
 		}
 	}
-	TESTTYPE t1;
-	deserilizeStruct((char*)&t1, ar1.stor + ar1[0].offset, ar1[0].size);
-	t1.x += 1;
+	TESTTYPE* t1;
+	//deserilizeStruct((char*)&t1, ar1.stor + ar1[0].offset, ar1[0].size);
+	t1 = (TESTTYPE*)ar1[0].data;
+	t1->x += 1;
 
-	std::vector<TESTTYPE> test1;
-	std::vector<EVERTYPE> test2;
+	std::vector<TESTTYPE*> test1;
+	std::vector<EVERTYPE*> test2;
 	bool exitf = false;
 	//while (!exitf) {
 	ar1.erase(20);
-	ar1.push_back((char*)&t1, sizeof(TESTTYPE), 0);
+	ar1.push_back((char*)t1, sizeof(TESTTYPE), 0);
 		for (size_t i = 0; i < ar1.getSize(); i++) {
 			//deserilize each set of data differently into their corresponding structs
 			switch (ar1[i].type) {
 			case 0:
-				TESTTYPE tp;
-				deserilizeStruct((char*)&tp, ar1.stor + ar1[i].offset, ar1[i].size);
-				test1.push_back(tp);
+				//TESTTYPE tp;
+				//deserilizeStruct((char*)&tp, ar1.stor + ar1[i].offset, ar1[i].size);
+				test1.push_back((TESTTYPE*)ar1[i].data);
 				break;
 			case 1:
-				EVERTYPE te;
-				deserilizeStruct((char*)&te, ar1.stor + ar1[i].offset, ar1[i].size);
-				test2.push_back(te);
+				//EVERTYPE te;
+				//deserilizeStruct((char*)&te, ar1.stor + ar1[i].offset, ar1[i].size);
+				test2.push_back((EVERTYPE*)ar1[i].data);
 				break;
 			}
 		}

@@ -6,12 +6,70 @@
 
 namespace Gore {
 
+	struct FreeList {
+		size_t offset;
+		FreeList* next;
+	};
 
+	//just memcpy data back instead of using freelist will be more efficent
+	template<class T>
 	class Vector {
 	private:
-
+		T* stor;
+		size_t offset;
+		size_t byte_size;
+		size_t allocd;
 	public:
-
+		Vector() {
+			stor = (T*)std::malloc(sizeof(T));
+			offset = 0;
+			byte_size = 0;
+			allocd = sizeof(T);
+		}
+		void push_back(T in) {
+			if (byte_size + sizeof(T) > allocd) {
+				T* temp = (T*)std::realloc(stor, allocd + sizeof(T));
+				if (temp != NULL) {
+					stor = temp;
+				}
+				allocd += sizeof(T);
+			}
+			*(stor + offset) = in;
+			offset++;
+			byte_size += sizeof(T);
+		}
+		void erase(int n) {
+			std::memcpy(stor + n, stor + n + 1, (offset - n) * sizeof(T));
+			offset--;
+		}
+		size_t size() {
+			return offset;
+		}
+		void reserve(size_t n) {
+			T* temp = (T*)std::realloc(stor, allocd + (sizeof(T) * n));
+			if (temp != NULL) {
+				stor = temp;
+			}
+			allocd += sizeof(T) * n;
+		}
+		void pop_back() {
+			offset--;
+		}
+		void insert() {
+			//will involve memcpy and realloc depending on space available 
+		}
+		void clear() {
+			offset = 0;
+		}
+		T& operator[] (int n) {
+			return *(stor + n);
+		}
+		//const T& operator[] (int n) {
+			//return stor + n;
+		//}
+		~Vector() {
+			std::free(stor);
+		}
 	};
 
 
@@ -19,6 +77,11 @@ namespace Gore {
 	struct StoreElement {
 		size_t offset;
 		size_t size;
+		size_t type;
+	};
+	//returns char pointer which you convert to the struct you want
+	struct ReturnElement {
+		char* data;
 		size_t type;
 	};
 	//keep track of your own types, I don't feel like writing a reflection system
@@ -108,12 +171,12 @@ namespace Gore {
 			return elements.size();
 		}
 
-		StoreElement& operator[](int n) {
-			return elements[n];
+		ReturnElement operator[](int n) {
+			return { stor + elements[n].offset, elements[n].type };
 		}
 
-		const StoreElement& operator[](int n) const {
-			return elements[n];
+		const ReturnElement operator[](int n) const {
+			return{ stor + elements[n].offset, elements[n].type };
 		}
 
 	};
