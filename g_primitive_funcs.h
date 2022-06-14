@@ -10,8 +10,6 @@ namespace Gore {
 		size_t offset;
 		FreeList* next;
 	};
-
-	//just memcpy data back instead of using freelist will be more efficent
 	template<class T>
 	class Vector {
 	private:
@@ -27,6 +25,7 @@ namespace Gore {
 			allocd = sizeof(T);
 		}
 		void push_back(T in) {
+			//remove if statement somehow for increased performance
 			if (byte_size + sizeof(T) > allocd) {
 				T* temp = (T*)std::realloc(stor, allocd + sizeof(T));
 				if (temp != NULL) {
@@ -39,8 +38,10 @@ namespace Gore {
 			byte_size += sizeof(T);
 		}
 		void erase(int n) {
+			//move entire chunk back by one and offset is reduced by one 
 			std::memcpy(stor + n, stor + n + 1, (offset - n) * sizeof(T));
 			offset--;
+			byte_size -= sizeof(T);
 		}
 		size_t size() {
 			return offset;
@@ -53,20 +54,34 @@ namespace Gore {
 			allocd += sizeof(T) * n;
 		}
 		void pop_back() {
+			//don't need to touch data will just be copied over next push_back
+			byte_size -= sizeof(T);
 			offset--;
 		}
-		void insert() {
-			//will involve memcpy and realloc depending on space available 
+		void insert(int n, T in) {
+			//checking if enough space to memcpy over
+			if (byte_size + sizeof(T) > allocd) {
+				T* temp = (T*)std::realloc(stor, allocd + sizeof(T));
+				if (temp != NULL) {
+					stor = temp;
+				}
+				allocd += sizeof(T);
+			}
+			//copy current data over by 1 offset
+			std::memcpy(stor + n + 1, stor + n, (offset - n) * sizeof(T));
+			*(stor + n) = in;
+			byte_size += sizeof(T);
+			offset++;
 		}
 		void clear() {
+			//just reset entire block of data, without deallocating it
+			std::memset(stor, 0, offset * sizeof(T));
 			offset = 0;
+			byte_size = 0;
 		}
 		T& operator[] (int n) {
 			return *(stor + n);
 		}
-		//const T& operator[] (int n) {
-			//return stor + n;
-		//}
 		~Vector() {
 			std::free(stor);
 		}
@@ -85,6 +100,7 @@ namespace Gore {
 		size_t type;
 	};
 	//keep track of your own types, I don't feel like writing a reflection system
+	//could probably optimize this pretty hard
 	class MultiVector {
 	private:
 		//stores the location of data and its size
@@ -97,9 +113,9 @@ namespace Gore {
 		size_t size;
 		//the number of bytes allocated
 		size_t allocd;
-	public:
 		//the actual pointer to the data
 		char* stor;
+	public:
 		MultiVector() {
 			stor = (char*)std::malloc(32);
 			index = stor;
@@ -107,7 +123,6 @@ namespace Gore {
 			allocd = 32;
 		}
 		void push_back(char* data, size_t insize, size_t type) {
-			char* pos = index;
 			size_t off = size;
 			//checking if item fits into any of the gaps
 			for (int i = 0; i < gaps.size(); i++) {
@@ -124,7 +139,6 @@ namespace Gore {
 					return;
 				}
 			}
-
 			if (size + insize > allocd) {
 				char* temp = (char*)std::realloc(stor, allocd + insize);
 				if (temp != NULL) {
@@ -135,7 +149,6 @@ namespace Gore {
 						index++;
 					}
 				}
-				pos = index;
 				allocd += insize;
 			}
 			for (size_t i = 0; i < insize; i++) {
@@ -165,6 +178,49 @@ namespace Gore {
 				}
 			}
 			allocd += in;
+		}
+		void insert(int n, char* data, size_t insize, size_t type) {
+			size_t off = size;
+			//checking if item fits into any of the gaps
+			for (int i = 0; i < gaps.size(); i++) {
+				if (gaps[i].size <= insize) {
+					char* t = stor + gaps[i].offset;
+					off = gaps[i].offset;
+					for (size_t j = 0; j < gaps[i].size; j++) {
+						*t = data[j];
+						t++;
+					}
+					StoreElement st = { off, insize, type };
+					elements.insert(elements.begin() + n, st);
+					gaps.erase(gaps.begin() + i);
+					return;
+				}
+			}
+			if (size + insize > allocd) {
+				char* temp = (char*)std::realloc(stor, allocd + insize);
+				if (temp != NULL) {
+					stor = temp;
+					index = stor;
+					//moving index back to where it was before we reallocd the memory
+					for (int i = 0; i < size; i++) {
+						index++;
+					}
+				}
+				allocd += insize;
+			}
+			for (size_t i = 0; i < insize; i++) {
+				*index = data[i];
+				index++;
+				size++;
+			}
+			elements.insert(elements.begin() + n, {off, insize, type});
+			size += insize;
+			index += insize;
+		}
+		void clear() {
+			elements.clear();
+			size = 0;
+			index = stor;
 		}
 
 		size_t getSize() {
