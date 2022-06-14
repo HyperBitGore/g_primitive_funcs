@@ -55,11 +55,9 @@ void vector_bench() {
 	double vec2acc_total(0);
 	double vec1er_total(0);
 	double vec2er_total(0);
-
 	for (int k = 0; k < 30; k++) {
 		Gore::Vector<TESTTYPE> vec1;
 		std::vector<TESTTYPE> vec2;
-
 		std::chrono::steady_clock::time_point time1 = std::chrono::steady_clock::now();
 		for (int i = 0; i < 1000; i++) {
 			TESTTYPE tep = { rand() % 1000, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 };
@@ -83,7 +81,7 @@ void vector_bench() {
 		
 		time1 = std::chrono::steady_clock::now();
 		for (int i = 0; i < vec1.size(); i++) {
-			vec1[i].x++;
+			vec1[i]->x++;
 		}
 		time2 = std::chrono::steady_clock::now();
 		time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1);
@@ -153,17 +151,17 @@ int main(){
 	}
 	TESTTYPE t = { 100, 1000, 0.2f, 100.524 };
 	//just testing my vector
-	std::cout << vec1[20].x << std::endl;
-	vec1[20].x = 100;
-	std::cout << vec1[20].x << std::endl;
-	vec1[21].x = 205;
+	std::cout << vec1[20]->x << std::endl;
+	vec1[20]->x = 100;
+	std::cout << vec1[20]->x << std::endl;
+	vec1[21]->x = 205;
 	vec1.erase(20);
-	std::cout << vec1[20].x << std::endl;
+	std::cout << vec1[20]->x << std::endl;
 	vec1.push_back(t);
 	vec1.insert(20, t);
 	vec1.push_back(t);
 	for (size_t i = 0; i < vec1.size(); i++) {
-		std::cout << i << " :" << vec1[i].x << " \n";
+		std::cout << i << " :" << vec1[i]->x << " \n";
 	}
 	ar1.push_back((char*)&t, sizeof(TESTTYPE), 0);
 	for (int i = 0; i < 100; i++) {

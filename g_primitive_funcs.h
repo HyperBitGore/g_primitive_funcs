@@ -25,13 +25,13 @@ namespace Gore {
 			allocd = sizeof(T);
 		}
 		void push_back(T in) {
-			//remove if statement somehow for increased performance
 			if (byte_size + sizeof(T) > allocd) {
-				T* temp = (T*)std::realloc(stor, allocd + sizeof(T));
+				//we realloc double the amount of data to reduce realloc calls
+				allocd = allocd << 1;
+				T* temp = (T*)std::realloc(stor, allocd);
 				if (temp != NULL) {
 					stor = temp;
 				}
-				allocd += sizeof(T);
 			}
 			*(stor + offset) = in;
 			offset++;
@@ -59,7 +59,7 @@ namespace Gore {
 			offset--;
 		}
 		void insert(int n, T in) {
-			//checking if enough space to memcpy over
+			//checking if enough space to memcpy over, branchless? 
 			if (byte_size + sizeof(T) > allocd) {
 				T* temp = (T*)std::realloc(stor, allocd + sizeof(T));
 				if (temp != NULL) {
@@ -79,8 +79,8 @@ namespace Gore {
 			offset = 0;
 			byte_size = 0;
 		}
-		T& operator[] (int n) {
-			return *(stor + n);
+		T* operator[] (int n) {
+			return stor + n;
 		}
 		~Vector() {
 			std::free(stor);
