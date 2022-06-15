@@ -79,8 +79,8 @@ namespace Gore {
 			offset = 0;
 			byte_size = 0;
 		}
-		T* operator[] (int n) {
-			return stor + n;
+		T& operator[] (int n) {
+			return stor[n];
 		}
 		~Vector() {
 			std::free(stor);
