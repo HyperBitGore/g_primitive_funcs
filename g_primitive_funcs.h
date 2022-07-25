@@ -1,8 +1,10 @@
 #pragma once
 #include <iostream>
 #include <vector>
-
-
+#include <thread>
+#include <queue>
+#include <functional>
+#include <mutex>
 
 namespace Gore {
 
@@ -125,7 +127,7 @@ namespace Gore {
 		void push_back(char* data, size_t insize, size_t type) {
 			size_t off = size;
 			//checking if item fits into any of the gaps
-			for (int i = 0; i < gaps.size(); i++) {
+			for (int i = 0; i < (int)gaps.size(); i++) {
 				if (gaps[i].size <= insize) {
 					char* t = stor + gaps[i].offset;
 					off = gaps[i].offset;
@@ -145,7 +147,7 @@ namespace Gore {
 					stor = temp;
 					index = stor;
 					//moving index back to where it was before we reallocd the memory
-					for (int i = 0; i < size; i++) {
+					for (int i = 0; i < (int)size; i++) {
 						index++;
 					}
 				}
@@ -173,7 +175,7 @@ namespace Gore {
 			if (temp != NULL) {
 				stor = temp;
 				index = stor;
-				for (int i = 0; i < size; i++) {
+				for (int i = 0; i < (int)size; i++) {
 					index++;
 				}
 			}
@@ -182,7 +184,7 @@ namespace Gore {
 		void insert(int n, char* data, size_t insize, size_t type) {
 			size_t off = size;
 			//checking if item fits into any of the gaps
-			for (int i = 0; i < gaps.size(); i++) {
+			for (int i = 0; i < (int)gaps.size(); i++) {
 				if (gaps[i].size <= insize) {
 					char* t = stor + gaps[i].offset;
 					off = gaps[i].offset;
@@ -202,7 +204,7 @@ namespace Gore {
 					stor = temp;
 					index = stor;
 					//moving index back to where it was before we reallocd the memory
-					for (int i = 0; i < size; i++) {
+					for (int i = 0; i < (int)size; i++) {
 						index++;
 					}
 				}
@@ -236,4 +238,98 @@ namespace Gore {
 		}
 
 	};
+	template<typename T>
+	class HashMap {
+	private:
+		std::vector<T> elements;
+
+	public:
+		HashMap() {
+			
+		}
+		~HashMap() {
+			elements.clear();
+		}
+	};
+	template<class F>
+	struct FObj {
+		F* current;
+		FObj<F>* next;
+		std::string name;
+	};
+
+
+	template<class W> 
+	class FowardList {
+	private:
+		FObj<W>* object = nullptr;
+	public:
+		//will have problem with remove function if pointer isn't created with new
+		void insert(W* item, std::string name) {
+			FObj<W>* nt = new FObj<W>;
+			nt->name = name;
+			nt->current = item;
+			nt->next = object;
+			object = nt;
+		}
+		void insert(W item, std::string name) {
+			FObj<W>* nt = new FObj<W>;
+			W* it = new W;
+			*it = item;
+			nt->name = name;
+			nt->current = it;
+			nt->next = object;
+			object = nt;
+		}
+		W* search(std::string name) {
+			FObj<W>* ptr = object;
+			while (ptr != nullptr) {
+				if (ptr->name.compare(name.c_str()) == 0) {
+					return ptr->current;
+				}
+				ptr = ptr->next;
+			}
+			return nullptr;
+		}
+		void removeFObj(std::string name) {
+			FObj<W>* ptr = object;
+			FObj<W>* prev = ptr;
+			int c = 0;
+			while (ptr != nullptr) {
+				if (ptr->name.compare(name.c_str()) == 0) {
+					prev->next = ptr->next;
+					ptr->name.clear();
+					if (c == 0) {
+						object = ptr->next;
+					}
+					delete ptr;
+					return;
+				}
+				prev = ptr;
+				ptr = ptr->next;
+				c++;
+			}
+		}
+		void removeBoth(std::string name) {
+			FObj<W>* ptr = object;
+			FObj<W>* prev = ptr;
+			int c = 0;
+			while (ptr != nullptr) {
+				if (ptr->name.compare(name.c_str()) == 0) {
+					prev->next = ptr->next;
+					ptr->name.clear();
+					if (c == 0) {
+						object = ptr->next;
+					}
+					delete ptr->current;
+					delete ptr;
+					return;
+				}
+				prev = ptr;
+				ptr = ptr->next;
+				c++;
+			}
+		}
+	};
+
 }

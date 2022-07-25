@@ -47,6 +47,16 @@ float randFloat(float min, float max) {
 	return out;
 }
 
+void testWork(float sx, float sy) {
+	Gore::Vector<EVERTYPE> vec1;
+	std::chrono::steady_clock::time_point time1 = std::chrono::steady_clock::now();
+	for (int i = 0; i < 10000; i++) {
+		vec1.push_back({ randFloat(sx, 5000), randFloat(sy, 5000), 25, 25, 255 });
+	}
+	std::chrono::steady_clock::time_point time2 = std::chrono::steady_clock::now();
+	std::chrono::duration<double> time_span = std::chrono::duration_cast<std::chrono::duration<double>>(time2 - time1);
+	std::cout << "test work time: " << time_span.count() << "\n";
+}
 
 void vector_bench() {
 	double vec1_total(0);
@@ -141,7 +151,21 @@ int main(){
 	srand(time(NULL));
 	Gore::MultiVector ar1;
 	ar1.reserve(200);
+	Gore::FowardList<TESTTYPE> flist;
+	flist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 }, "1");
+	flist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 101.524 }, "2");
+	flist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 105.524 }, "bol");
+	flist.removeBoth("bol");
+	if (flist.search("bol") != nullptr) {
+		std::cout << "found\n";
+	}
+	std::cout << flist.search("1")->w << "\n";
+	std::cout << flist.search("2")->w << "\n";
 	Gore::Vector<TESTTYPE> vec1;
+	/*Gore::ThreadPool pool;
+	pool.addJob(vector_bench);
+	pool.addJob(vector_bench);
+	pool.addJob(testWork, { 100.0f, 200.0f });*/
 	std::vector<TESTTYPE> vec2;
 	//speed testing my vector against standard library one
 	vector_bench();
@@ -203,6 +227,6 @@ int main(){
 	test2;
 
 	std::cout << sizeof(Gore::MultiVector) << std::endl;
-
+	system("pause");
 	return 0;
 }
