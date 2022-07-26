@@ -1,10 +1,7 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include <thread>
-#include <queue>
 #include <functional>
-#include <mutex>
 
 namespace Gore {
 
@@ -238,27 +235,13 @@ namespace Gore {
 		}
 
 	};
-	template<typename T>
-	class HashMap {
-	private:
-		std::vector<T> elements;
-
-	public:
-		HashMap() {
-			
-		}
-		~HashMap() {
-			elements.clear();
-		}
-	};
+	
 	template<class F>
 	struct FObj {
 		F* current;
 		FObj<F>* next;
 		std::string name;
 	};
-
-
 	template<class W> 
 	class FowardList {
 	private:
@@ -331,5 +314,64 @@ namespace Gore {
 			}
 		}
 	};
+	template<typename T>
+	struct MapItem {
+		std::string key;
+		T item;
+		MapItem<T>* next;
+	};
+	//gonna be more inefficent than a specially designed version
+	template<typename T>
+	class HashMap {
+	private:
+		std::vector<MapItem<T>*> buckets;
+		std::function<int(std::string)> hash_func;
+	public:
+		HashMap() {
 
+		}
+		~HashMap() {
+
+			buckets.clear();
+		}
+		void insert(std::string f, T item) {
+			int n = hash_func(f);
+			if (n > int(buckets.size()) - 1) {
+				int dif = n - (buckets.size() - 1);
+				for (dif; dif > 0; dif--) {
+					buckets.push_back(nullptr);
+				}
+			}
+			MapItem<T>* temp = buckets[n];
+			buckets[n] = new MapItem<T>;
+			buckets[n]->key = f;
+			buckets[n]->item = item;
+			buckets[n]->next = temp;
+			
+		}
+		T* get(std::string f) {
+			int n = hash_func(f);
+			if (n > int(buckets.size()) - 1) {
+				return nullptr;
+			}
+			if (buckets[n]->key.compare(f) != 0) {
+				MapItem<T>* ptr = buckets[n];
+				while (ptr != nullptr) {
+					if (ptr->key.compare(f) == 0) {
+						return &ptr->item;
+					}
+					ptr = ptr->next;
+				}
+			}
+			return &buckets[n]->item;
+		}
+		void setHashFunction(std::function<int(std::string)> in) {
+			buckets.clear();
+			hash_func = in;
+		}
+		void reserve(size_t n) {
+			buckets.reserve(n);
+		}
+
+	};
 }

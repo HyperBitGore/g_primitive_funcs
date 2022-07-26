@@ -58,6 +58,14 @@ void testWork(float sx, float sy) {
 	std::cout << "test work time: " << time_span.count() << "\n";
 }
 
+int hashTest(std::string in) {
+	int size = 0;
+	for (int i = 0; i < in.size(); i++) {
+		size += in[i];
+	}
+	return size % 10;
+}
+
 void vector_bench() {
 	double vec1_total(0);
 	double vec2_total(0);
@@ -161,6 +169,12 @@ int main(){
 	}
 	std::cout << flist.search("1")->w << "\n";
 	std::cout << flist.search("2")->w << "\n";
+	Gore::HashMap<EVERTYPE> map1;
+	map1.setHashFunction(hashTest);
+	map1.insert("first", { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
+	map1.insert("fugor", { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
+	std::cout << map1.get("first")->w << std::endl;
+	std::cout << map1.get("fugor")->w << std::endl;
 	Gore::Vector<TESTTYPE> vec1;
 	/*Gore::ThreadPool pool;
 	pool.addJob(vector_bench);
