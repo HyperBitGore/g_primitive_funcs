@@ -42,10 +42,33 @@ struct EVERTYPE {
 	uint8_t r;
 };
 
+
+
 float randFloat(float min, float max) {
 	float out = rand() / static_cast<float>(RAND_MAX / (max - min));
 	return out;
 }
+
+class ITTEST {
+private:
+	int x;
+	float y;
+public:
+	ITTEST() {
+		x = rand() % 100;
+		y = randFloat(0.01f, 1000.0f);
+	}
+	void Update() {
+		x += rand() % 2;
+		y += 0.05f;
+	}
+	int getX() {
+		return x;
+	}
+	float getY() {
+		return y;
+	}
+};
 
 void testWork(float sx, float sy) {
 	Gore::Vector<EVERTYPE> vec1;
@@ -186,6 +209,21 @@ int main(){
 	for (int i = 0; i < 1000; i++) {
 		TESTTYPE tep = { 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 };
 		vec1.push_back(tep);
+	}
+	for (auto& i : vec1) {
+		i.w++;
+	}
+	//testing classes in my vector
+	Gore::Vector<ITTEST> vecC;
+	for (int i = 0; i < 50; i++) {
+		ITTEST t;
+		vecC.push_back(t);
+		std::cout << t.getX() << "\n";
+	}
+	std::cout << "After Update\n";
+	for (auto& i : vecC) {
+		i.Update();
+		std::cout << i.getX() << "\n";
 	}
 	TESTTYPE t = { 100, 1000, 0.2f, 100.524 };
 	//just testing my vector

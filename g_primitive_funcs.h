@@ -5,12 +5,16 @@
 
 namespace Gore {
 
-	struct FreeList {
-		size_t offset;
-		FreeList* next;
-	};
+	
+
+
+	
 	template<class T>
 	class Vector {
+	public:
+		using iterator = T*;
+		iterator begin() { return stor; }
+		iterator end() { return stor + offset; }
 	private:
 		T* stor;
 		size_t offset;
