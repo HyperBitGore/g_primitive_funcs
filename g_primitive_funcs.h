@@ -355,7 +355,7 @@ namespace Gore {
 		}
 		T* get(std::string f) {
 			int n = hash_func(f);
-			if (n > int(buckets.size()) - 1) {
+			if (n > int(buckets.size()) - 1 || buckets[n] == nullptr) {
 				return nullptr;
 			}
 			if (buckets[n]->key.compare(f) != 0) {
@@ -366,6 +366,7 @@ namespace Gore {
 					}
 					ptr = ptr->next;
 				}
+				return nullptr;
 			}
 			return &buckets[n]->item;
 		}
