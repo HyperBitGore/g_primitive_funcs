@@ -318,6 +318,84 @@ namespace Gore {
 			}
 		}
 	};
+	template<typename F>
+	struct FBObj {
+		F* current;
+		FBObj<F>* prev;
+		FBObj<F>* next;
+		std::string name;
+	};
+	//forwards and backwards linked list
+	template<class T>
+	class FBList {
+	public:
+		FBObj<T>* obj;
+		FBList() {
+			obj = nullptr;
+		}
+		void insert(T in_obj, std::string name) {
+			FBObj<T>* nt = new FBObj<T>;
+			nt->current = new T;
+			*nt->current = in_obj;
+			nt->name = name;
+			nt->next = obj;
+			nt->prev = nullptr;
+			(obj != nullptr) ? obj->prev = nt : nt;
+			obj = nt;
+		}
+		void insert(T* in_obj, std::string name) {
+			FBObj<T>* nt = new FBObj<T>;
+			nt->current = in_obj;
+			nt->name = name;
+			nt->next = obj;
+			nt->prev = nullptr;
+			(obj != nullptr) ? obj->prev = nt : nt;
+			obj = nt;
+		}
+		T* search(std::string name) {
+			FBObj<T>* ptr = obj;
+			while (ptr != nullptr) {
+				if (name.compare(ptr->name) == 0) {
+					return ptr->current;
+				}
+				ptr = ptr->next;
+			}
+			return nullptr;
+		}
+		void removeBoth(std::string name) {
+			FBObj<T>* ptr = obj;
+			while (ptr != nullptr) {
+				if (name.compare(ptr->name) == 0) {
+					FBObj<T>* t1 = ptr->prev;
+					FBObj<T>* t2 = ptr->next;
+					(t1 != nullptr) ? t1->next = t2 : obj = t2;
+					(t2 != nullptr) ? t2->prev = t1 : t2;
+					ptr->name.clear();
+					delete ptr->current;
+					delete ptr;
+					return;
+				}
+				ptr = ptr->next;
+			}
+		}
+		void removeLinkObj(std::string name) {
+			FBObj<T>* ptr = obj;
+			while (ptr != nullptr) {
+				if (name.compare(ptr->name) == 0) {
+					FBObj<T>* t1 = ptr->prev;
+					FBObj<T>* t2 = ptr->next;
+					(t1 != nullptr) ? t1->next = t2 : obj = t2;
+					(t2 != nullptr) ? t2->prev = t1 : t2;
+					ptr->name.clear();
+					delete ptr;
+					return;
+				}
+				ptr = ptr->next;
+			}
+		}
+	};
+
+
 	template<typename T>
 	struct MapItem {
 		std::string key;

@@ -192,6 +192,13 @@ int main(){
 	}
 	std::cout << flist.search("1")->w << "\n";
 	std::cout << flist.search("2")->w << "\n";
+
+	Gore::FBList<TESTTYPE> fblist;
+	fblist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 }, "1");
+	fblist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 }, "2");
+	fblist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 }, "3");
+	fblist.removeBoth("1");
+
 	Gore::HashMap<EVERTYPE> map1;
 	map1.setHashFunction(hashTest);
 	map1.insert("first", { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
