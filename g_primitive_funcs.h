@@ -247,7 +247,7 @@ namespace Gore {
 		std::string name;
 	};
 	template<class W> 
-	class FowardList {
+	class ForwardList {
 	private:
 		FObj<W>* object = nullptr;
 	public:
@@ -392,6 +392,9 @@ namespace Gore {
 				}
 				ptr = ptr->next;
 			}
+		}
+		FBObj<T>* getHead() {
+			return obj;
 		}
 	};
 

@@ -182,7 +182,7 @@ int main(){
 	srand(time(NULL));
 	Gore::MultiVector ar1;
 	ar1.reserve(200);
-	Gore::FowardList<TESTTYPE> flist;
+	Gore::ForwardList<TESTTYPE> flist;
 	flist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 }, "1");
 	flist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 101.524 }, "2");
 	flist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 105.524 }, "bol");
