@@ -88,6 +88,10 @@ int hashTest(std::string in) {
 	}
 	return size % 10;
 }
+int hashTest2(int in) {
+	return in % 10;
+}
+
 
 void vector_bench() {
 	double vec1_total(0);
@@ -199,12 +203,21 @@ int main(){
 	fblist.insert({ 101, rand() % 100, randFloat(0.0001f, 100.42f), 100.524 }, "3");
 	fblist.removeBoth("1");
 
-	Gore::HashMap<EVERTYPE> map1;
+	Gore::HashMap<EVERTYPE, std::string> map1;
 	map1.setHashFunction(hashTest);
 	map1.insert("first", { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
+	map1.insert("roguf", { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
 	map1.insert("fugor", { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
 	std::cout << map1.get("first")->w << std::endl;
 	std::cout << map1.get("fugor")->w << std::endl;
+	map1.remove("fugor");
+	Gore::HashMap<EVERTYPE, int> map2;
+	map2.reserve(10);
+	map2.setHashFunction(hashTest2);
+	map2.insert(50, { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
+	map2.insert(5, { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
+	std::cout << map2.get(50)->w << std::endl;
+	std::cout << map2.get(5)->w << std::endl;
 	Gore::Vector<TESTTYPE> vec1;
 	/*Gore::ThreadPool pool;
 	pool.addJob(vector_bench);
