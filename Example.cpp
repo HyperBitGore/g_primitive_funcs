@@ -218,6 +218,29 @@ int main(){
 	map2.insert(5, { randFloat(0.0001f, 1000.5f), randFloat(0.0001f, 1000.5f), rand() % 100, rand() % 100, 255 });
 	std::cout << map2.get(50)->w << std::endl;
 	std::cout << map2.get(5)->w << std::endl;
+
+	Gore::GStack<int> stack1;
+	stack1.push(0);
+	stack1.push(2);
+	stack1.push(4);
+	std::cout << stack1.pop() << "\n";
+	std::cout << stack1.pop() << "\n";
+
+	Gore::Queue<int> queue1;
+	for (int i = 0; i < 10; i++) {
+		queue1.enqueue(i);
+	}
+	std::cout << queue1.dequeue() << "\n";
+	std::cout << queue1.dequeue() << "\n";
+	std::cout << queue1.dequeue() << "\n";
+
+	std::vector<int> p;
+	for (int i = 0; i < 10; i++) {
+		p.push_back(rand() % 100);
+	}
+	Gore::Sort<int>::Quicksort(p);
+	std::cout << p.size() << "\n";
+
 	Gore::Vector<TESTTYPE> vec1;
 	/*Gore::ThreadPool pool;
 	pool.addJob(vector_bench);

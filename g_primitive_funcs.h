@@ -10,7 +10,19 @@
 
 namespace Gore {
 
-	
+	template<class T>
+	class Stack {
+		Stack() {
+
+		}
+		~Stack() {
+
+		}
+
+
+
+	};
+
 
 
 	
@@ -522,6 +534,140 @@ namespace Gore {
 		}
 		void reserve(size_t n) {
 			buckets.reserve(n);
+		}
+
+	};
+
+	//throw whatever class you want in there
+	template<class T>
+	class GStack {
+		public:
+		using iterator = T*;
+		iterator begin() { return stack; }
+		iterator end() { return stack + offset; }
+		private:
+			T* stack;
+			size_t allocd;
+			size_t offset;
+		public:
+			GStack() {
+				stack = (T*)std::malloc(256);
+				allocd = 256;
+				offset = 0;
+			}
+			~GStack() {
+				std::free(stack);
+			}
+
+			void push(T in) {
+				if ((offset * sizeof(T)) + sizeof(T) > allocd) {
+					stack = (T*)std::realloc(stack, allocd * 2);
+					allocd *= 2;
+				}
+				std::memcpy(stack + 1, stack, (sizeof(T) * offset));
+				*stack = in;
+				offset++;
+			}
+
+			T pop() {
+				T out = *stack;
+				std::memcpy(stack, stack + 1, (sizeof(T) * offset));
+				offset--;
+				return out;
+			}
+			size_t size() {
+				return offset;
+			}
+			void clear() {
+				std::memset(stack, 0, allocd);
+				offset = 0;
+			}
+
+	};
+	template<class T>
+	class Queue {
+	public:
+		using iterator = T*;
+		iterator begin() { return queue; }
+		iterator end() { return queue + offset; }
+	private:
+		T* queue;
+		size_t offset;
+		size_t allocd;
+	public:
+		Queue() {
+			queue = (T*)std::malloc(256);
+			allocd = 256;
+			offset = 0;
+		}
+		~Queue() {
+			std::free(queue);
+		}
+		void enqueue(T in) {
+			if ((offset * sizeof(T)) + sizeof(T) > allocd) {
+				queue = (T*)std::realloc(queue, allocd * 2);
+				allocd *= 2;
+			}
+			*(queue + offset) = in;
+			offset++;
+		}
+		T dequeue() {
+			T out = *queue;
+			offset--;
+			std::memcpy(queue, queue + 1, (sizeof(T) * offset));
+			return out;
+		}
+		size_t size() {
+			return offset;
+		}
+		void clear() {
+			std::memset(queue, 0, (sizeof(T) * offset);
+			offset = 0;
+		}
+	};
+	template<class T>
+	class Sort {
+	public:
+		static void Quicksort(Gore::Vector<T>& arr) {
+
+		}
+		static void Quicksort(std::vector<T>& arr) {
+
+		}
+
+		static void Mergesort(Gore::Vector<T>& arr) {
+
+		}
+		static void Mergesort(std::vector<T>& arr) {
+
+		}
+
+		static void Insertionsort(Gore::Vector<T>& arr) {
+
+		}
+		static void Insertionsort(std::vector<T>& arr) {
+
+		}
+
+		static void Timsort(Gore::Vector<T>& arr) {
+
+		}
+		static void Timsort(std::vector<T>& arr) {
+
+		}
+
+		static void Heapsort(Gore::Vector<T>& arr) {
+
+		}
+		static void Heapsort(std::vector<T>& arr) {
+
+		}
+
+		static void Bubblesort(Gore::Vector<T>& arr) {
+
+		}
+		static void Bubblesort(std::vector<T>& arr) {
+
 		}
 
 	};
