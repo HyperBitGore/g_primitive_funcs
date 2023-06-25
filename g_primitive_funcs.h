@@ -10,19 +10,6 @@
 
 namespace Gore {
 
-	template<class T>
-	class Stack {
-		Stack() {
-
-		}
-		~Stack() {
-
-		}
-
-
-
-	};
-
 
 
 	
@@ -44,16 +31,25 @@ namespace Gore {
 			byte_size = 0;
 			allocd = sizeof(T);
 		}
+		//copy constructor for returns
+		Vector(const Vector& in) {
+			stor = (T*)std::malloc(sizeof(T));
+			allocd = (sizeof(T));
+			reserve(in.offset);
+			std::memcpy(stor, in.stor, in.byte_size);
+			byte_size = in.byte_size;
+			offset = in.offset;
+		}
+		//https://en.cppreference.com/w/cpp/language/move_constructor
+
 		void push_back(T in) {
 			if (byte_size + sizeof(T) > allocd) {
 				//we realloc double the amount of data to reduce realloc calls
-				allocd = allocd << 1;
-				T* temp = (T*)std::realloc(stor, allocd);
-				if (temp != NULL) {
-					stor = temp;
-				}
+				//allocd = allocd << 1;
+				stor = (T*)std::realloc(stor, allocd * 2);
+				allocd *= 2;
 			}
-			*(stor + offset) = in;
+			stor[offset] = in;
 			offset++;
 			byte_size += sizeof(T);
 		}
@@ -102,8 +98,20 @@ namespace Gore {
 		T& operator[] (int n) {
 			return stor[n];
 		}
+
+		Gore::Vector<T> operator= (Gore::Vector<T> in) {
+			Gore::Vector<T> nc;
+			nc.reserve(in.size());
+			std::memcpy(nc.stor, in.stor, in.byte_size);
+			nc.byte_size = in.byte_size;
+			nc.offset = in.size();
+			return nc;
+		}
+
 		~Vector() {
-			std::free(stor);
+			if (stor) {
+				std::free(stor);
+			}
 		}
 	};
 
@@ -621,25 +629,144 @@ namespace Gore {
 			return offset;
 		}
 		void clear() {
-			std::memset(queue, 0, (sizeof(T) * offset);
+			std::memset(queue, 0, (sizeof(T) * offset));
 			offset = 0;
 		}
 	};
+	//only really works for built in number data types, add your own exceptions if you want
 	template<class T>
 	class Sort {
-	public:
-		static void Quicksort(Gore::Vector<T>& arr) {
+	private:
+		static Gore::Vector<T> partition(Gore::Vector<T>& arr) {
+			if (arr.size() < 2) {
+				return arr;
+			}
+			Gore::Vector<T> left;
+			Gore::Vector<T> right;
+			size_t pivot = arr.size() - 1;
+			for (int i = 0; i < pivot; i++) {
+				if (arr[i] < arr[pivot]) {
+					left.push_back(arr[i]);
+				}
+				else {
+					right.push_back(arr[i]);
+				}
+			}
+			Gore::Vector<T> ol = partition(left);
+			Gore::Vector<T> orl = partition(right);
+			ol.push_back(arr[pivot]);
+			for (int i = 0; i < orl.size(); i++) {
+				ol.push_back(orl[i]);
+			}
 
+			return ol;
 		}
-		static void Quicksort(std::vector<T>& arr) {
 
+		static std::vector<T> partition(std::vector<T>& arr) {
+			if (arr.size() < 2) { 
+				return arr; }
+			std::vector<T> left;
+			std::vector<T> right;
+			size_t pivot = arr.size() - 1;
+			for (int i = 0; i < pivot; i++) {
+				if (arr[i] < arr[pivot]) {
+					left.push_back(arr[i]);
+				}
+				else {
+					right.push_back(arr[i]);
+				}
+			}
+			std::vector<T> ol = partition(left);
+			std::vector<T> orl = partition(right);
+			ol.push_back(arr[pivot]);
+			for (int i = 0; i < orl.size(); i++) {
+				ol.push_back(orl[i]);
+			}
+			
+			return ol;
+		}
+		static std::vector<T> merge(std::vector<T>& arr) {
+			if (arr.size() < 2) {
+				return arr;
+			}
+			size_t middle = arr.size() / 2;
+			std::vector<T> left;
+			std::vector<T> right;
+			for (int i = 0; i < middle; i++) { left.push_back(arr[i]); }
+			for (int i = arr.size() - 1; i >= middle; i--) { right.push_back(arr[i]); }
+			left = merge(left);
+			right = merge(right);
+			std::vector<T> out;
+			size_t small = 0;
+			size_t smallr = 0;
+			while (true) {
+				if (left[small] < right[smallr]) {
+					int i;
+					for (i = 0; i < out.size() && out[i] < left[small]; i++);
+					if (i == out.size()) {
+						out.push_back(left[small]);
+					}
+					else {
+						out.insert(out.begin() + i, left[small]);
+					}
+					small++;
+				}
+				else if(right[smallr] < left[small]) {
+					int i;
+					for (i = 0; i < out.size() && out[i] < right[smallr]; i++);
+					if (i == out.size()) {
+						out.push_back(right[smallr]);
+					}
+					else {
+						out.insert(out.begin() + i, right[smallr]);
+					}
+					smallr++;
+				}
+				//hit final element
+				if (smallr == right.size()) {
+					size_t start = out.size() - 1;
+					for (int i = small; i < left.size(); i++) {
+						if (left[i] > out[start]) {
+							out.push_back(left[i]);
+						}
+						else {
+							out.insert(out.begin() + start + 1, left[i]);
+							start++;
+						}
+					}
+					break;
+				}
+				else if (small == left.size()) {
+					//have to add in the order of the smallest
+					size_t start = out.size() - 1;
+					for (int i = smallr; i < right.size(); i++) {
+						if (right[i] > out[start]) {
+							out.push_back(right[i]);
+						}
+						else {
+							out.insert(out.begin() + start + 1, right[i]);
+							start++;
+						}
+					}
+					break;
+				}
+			}
+			return out;
+		}
+
+	public:
+		static Gore::Vector<T> Quicksort(Gore::Vector<T>& arr) {
+			return partition(arr);
+		}
+		static std::vector<T> Quicksort(std::vector<T>& arr) {
+			return partition(arr);
 		}
 
 		static void Mergesort(Gore::Vector<T>& arr) {
 
 		}
-		static void Mergesort(std::vector<T>& arr) {
-
+		static std::vector<T> Mergesort(std::vector<T>& arr) {
+			return merge(arr);
 		}
 
 		static void Insertionsort(Gore::Vector<T>& arr) {

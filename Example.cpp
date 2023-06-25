@@ -234,12 +234,22 @@ int main(){
 	std::cout << queue1.dequeue() << "\n";
 	std::cout << queue1.dequeue() << "\n";
 
-	std::vector<int> p;
+	Gore::Vector<int> p;
 	for (int i = 0; i < 10; i++) {
 		p.push_back(rand() % 100);
 	}
-	Gore::Sort<int>::Quicksort(p);
-	std::cout << p.size() << "\n";
+	Gore::Vector<int> out = Gore::Sort<int>::Quicksort(p);
+	std::cout << "begin: \n";
+	for (int i = 0; i < out.size(); i++) {
+		std::cout << out[i] << "\n";
+	}
+	std::vector<int> pp;
+	for (int i = 0; i < 10; i++) {
+		pp.push_back(rand() % 100);
+	}
+	std::vector<int> out2 = Gore::Sort<int>::Mergesort(pp);
+	std::cout << out2.size() << "\n";
+
 
 	Gore::Vector<TESTTYPE> vec1;
 	/*Gore::ThreadPool pool;
