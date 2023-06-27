@@ -238,17 +238,19 @@ int main(){
 	for (int i = 0; i < 10; i++) {
 		p.push_back(rand() % 100);
 	}
-	Gore::Vector<int> out = Gore::Sort<int>::Quicksort(p);
+	Gore::Sort<int>::Selectionsort(p);
+	//Gore::Vector<int> out = Gore::Sort<int>::Mergesort(p);
 	std::cout << "begin: \n";
-	for (int i = 0; i < out.size(); i++) {
-		std::cout << out[i] << "\n";
+	for (int i = 0; i < p.size(); i++) {
+		std::cout << p[i] << "\n";
 	}
 	std::vector<int> pp;
 	for (int i = 0; i < 10; i++) {
 		pp.push_back(rand() % 100);
 	}
-	std::vector<int> out2 = Gore::Sort<int>::Mergesort(pp);
-	std::cout << out2.size() << "\n";
+	Gore::Sort<int>::Selectionsort(pp);
+	//std::vector<int> out2 = Gore::Sort<int>::Mergesort(pp);
+	std::cout << pp.size() << "\n";
 
 
 	Gore::Vector<TESTTYPE> vec1;

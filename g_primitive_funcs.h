@@ -754,6 +754,75 @@ namespace Gore {
 			return out;
 		}
 
+		static Gore::Vector<T> merge(Gore::Vector<T>& arr) {
+			if (arr.size() < 2) {
+				return arr;
+			}
+			size_t middle = arr.size() / 2;
+			Gore::Vector<T> left;
+			Gore::Vector<T> right;
+			for (int i = 0; i < middle; i++) { left.push_back(arr[i]); }
+			for (int i = arr.size() - 1; i >= middle; i--) { right.push_back(arr[i]); }
+			left = merge(left);
+			right = merge(right);
+			Gore::Vector<T> out;
+			size_t small = 0;
+			size_t smallr = 0;
+			while (true) {
+				if (left[small] < right[smallr]) {
+					int i;
+					for (i = 0; i < out.size() && out[i] < left[small]; i++);
+					if (i == out.size()) {
+						out.push_back(left[small]);
+					}
+					else {
+						out.insert(i, left[small]);
+					}
+					small++;
+				}
+				else if (right[smallr] < left[small]) {
+					int i;
+					for (i = 0; i < out.size() && out[i] < right[smallr]; i++);
+					if (i == out.size()) {
+						out.push_back(right[smallr]);
+					}
+					else {
+						out.insert(i, right[smallr]);
+					}
+					smallr++;
+				}
+				//hit final element
+				if (smallr == right.size()) {
+					size_t start = out.size() - 1;
+					for (int i = small; i < left.size(); i++) {
+						if (left[i] > out[start]) {
+							out.push_back(left[i]);
+						}
+						else {
+							out.insert(start + 1, left[i]);
+							start++;
+						}
+					}
+					break;
+				}
+				else if (small == left.size()) {
+					//have to add in the order of the smallest
+					size_t start = out.size() - 1;
+					for (int i = smallr; i < right.size(); i++) {
+						if (right[i] > out[start]) {
+							out.push_back(right[i]);
+						}
+						else {
+							out.insert(start + 1, right[i]);
+							start++;
+						}
+					}
+					break;
+				}
+			}
+			return out;
+		}
+
 	public:
 		static Gore::Vector<T> Quicksort(Gore::Vector<T>& arr) {
 			return partition(arr);
@@ -762,38 +831,120 @@ namespace Gore {
 			return partition(arr);
 		}
 
-		static void Mergesort(Gore::Vector<T>& arr) {
-
+		static Gore::Vector<T> Mergesort(Gore::Vector<T>& arr) {
+			return merge(arr);
 		}
 		static std::vector<T> Mergesort(std::vector<T>& arr) {
 			return merge(arr);
 		}
 
 		static void Insertionsort(Gore::Vector<T>& arr) {
+			for (size_t i = 1; i < arr.size(); i++) {
+				size_t j = 0; //place to insert new element
+				for (j; j < i && arr[j] < arr[i]; j++);
+				T temp2 = arr[i];
+				//shift the array over to the right by one
+				for (int p = i - 1; p >= j && p >= 0; p--) {
+					arr[p + 1] = arr[p];
+				}
 
+				arr[j] = temp2;
+			}
 		}
 		static void Insertionsort(std::vector<T>& arr) {
+			for (size_t i = 1; i < arr.size(); i++) {
+				size_t j = 0; //place to insert new element
+				for (j; j < i && arr[j] < arr[i]; j++);
+				T temp2 = arr[i];
+				//shift the array over to the right by one
+				for (int p = i - 1; p >= j && p >= 0; p--) {
+					arr[p + 1] = arr[p];
+				}
 
-		}
-
-		static void Timsort(Gore::Vector<T>& arr) {
-
-		}
-		static void Timsort(std::vector<T>& arr) {
-
-		}
-
-		static void Heapsort(Gore::Vector<T>& arr) {
-
-		}
-		static void Heapsort(std::vector<T>& arr) {
+				arr[j] = temp2;
+			}
 
 		}
 
 		static void Bubblesort(Gore::Vector<T>& arr) {
-
+			while (true) {
+				bool swap = false;
+				for (int i = 0; i < arr.size() - 1; i++) {
+					if (arr[i + 1] < arr[i]) {
+						T temp = arr[i];
+						arr[i] = arr[i + 1];
+						arr[i + 1] = temp;
+						swap = true;
+					}
+				}
+				if (!swap) {
+					return;
+				}
+			}
 		}
 		static void Bubblesort(std::vector<T>& arr) {
+			while (true) {
+				bool swap = false;
+				for (int i = 0; i < arr.size() - 1; i++) {
+					if (arr[i + 1] < arr[i]) {
+						T temp = arr[i];
+						arr[i] = arr[i + 1];
+						arr[i + 1] = temp;
+						swap = true;
+					}
+				}
+				if (!swap) {
+					return;
+				}
+			}
+		}
+
+		static void Selectionsort(Gore::Vector<T>& arr) {
+			for (int i = 0; i < arr.size(); i++) {
+				int small = i;
+				for (int j = i; j < arr.size(); j++) {
+					if (arr[j] < arr[small]) {
+						small = j;
+					}
+				}
+				T temp = arr[small];
+				arr[small] = arr[i];
+				arr[i] = temp;
+			}
+		}
+		static void Selectionsort(std::vector<T>& arr) {
+			for (int i = 0; i < arr.size(); i++) {
+				int small = i;
+				for (int j = i; j < arr.size(); j++) {
+					if (arr[j] < arr[small]) {
+						small = j;
+					}
+				}
+				T temp = arr[small];
+				arr[small] = arr[i];
+				arr[i] = temp;
+			}
+		}
+
+		static void Bucketsort(Gore::Vector<T>& arr) {
+
+		}
+		static void Bucketsort(std::vector<T>& arr) {
+
+		}
+		static void Radixsort(Gore::Vector<T>& arr) {
+
+		}
+
+		static void Radixsort(std::vector<T>& arr) {
+
+		}
+
+		static void Countingsort(Gore::Vector<T>& arr) {
+
+		}
+
+		static void Countingsort(std::vector<T>& arr) {
 
 		}
 
